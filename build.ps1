@@ -110,13 +110,20 @@ if (-not $QuicTlsRef) {
     $QuicTlsRef = Get-LatestQuicTlsRef -Headers $headers
 }
 
-Write-Host "Building with Alpine $AlpineVersion, NGINX $NginxVersion, quictls $QuicTlsRef"
+$rawTag = "$NginxVersion-$QuicTlsRef"
+$dockerTag = ($rawTag -replace '[^A-Za-z0-9_.-]', '-')
+if ($dockerTag -ne $rawTag) {
+    Write-Host "Normalized Docker tag from '$rawTag' to '$dockerTag' to satisfy registry constraints."
+}
+
+Write-Host "Building with Alpine $AlpineVersion, NGINX $NginxVersion, quictls $QuicTlsRef (tag: $dockerTag)"
 
 if ($MetadataPath) {
     $metadata = [pscustomobject]@{
         AlpineVersion = $AlpineVersion
         NginxVersion  = $NginxVersion
         QuicTlsRef    = $QuicTlsRef
+        DockerTag     = $dockerTag
     }
     $metadata | ConvertTo-Json | Set-Content -Path $MetadataPath -Encoding UTF8
 }
@@ -130,6 +137,6 @@ docker buildx build --platform linux/amd64 `
     --build-arg "ALPINE_VERSION=$AlpineVersion" `
     --build-arg "NGINX_VERSION=$NginxVersion" `
     --build-arg "QUICTLS_REF=$QuicTlsRef" `
-    -t "valtoni/nginx-quic:${NginxVersion}-${QuicTlsRef}" `
+    -t "valtoni/nginx-quic:${dockerTag}" `
     --push `
     .
