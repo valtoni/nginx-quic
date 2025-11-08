@@ -35,16 +35,16 @@ jobs:
           "alpine=$($meta.AlpineVersion)" >> $env:GITHUB_OUTPUT
           "nginx=$($meta.NginxVersion)" >> $env:GITHUB_OUTPUT
           "quic=$($meta.QuicTlsRef)" >> $env:GITHUB_OUTPUT
+          "docker_tag=$($meta.DockerTag)" >> $env:GITHUB_OUTPUT
 
       - name: Ensure Docker tag is new
         id: tag-check
         shell: bash
         env:
-          NGINX_VERSION: ${{ steps.versions.outputs.nginx }}
-          QUICTLS_REF: ${{ steps.versions.outputs.quic }}
+          DOCKER_TAG: ${{ steps.versions.outputs.docker_tag }}
         run: |
           set -euo pipefail
-          TAG="${NGINX_VERSION}-${QUICTLS_REF}"
+          TAG="${DOCKER_TAG}"
           URL="https://hub.docker.com/v2/repositories/valtoni/nginx-quic/tags/${TAG}"
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$URL")
           if [ "$STATUS" = "200" ]; then
@@ -153,4 +153,3 @@ jobs:
           fi
           git commit --allow-empty -m "docs: record nightly build $GITHUB_RUN_ID"
           git push
-
