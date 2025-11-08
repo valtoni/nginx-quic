@@ -1,9 +1,9 @@
 # nginx-quic
 
-This repository builds an nginx image with the QUIC/TLS patches on top of Alpine and publishes it to Docker Hub.
+This repository builds an nginx image with the QUIC/TLS patches on top of Alpine and publishes it to Docker Hub. Published tags use the format `valtoni/nginx-quic:<nginx-version>-<quictls-ref>` so it is clear which QUIC/TLS bundle was used.
 
 ## Build script
-- `build.ps1` downloads the latest Alpine, NGINX and quictls references (unless provided) and pushes the resulting image to `valtoni/nginx-quic`.
+- `build.ps1` downloads the latest Alpine, NGINX and quictls references (unless provided) and pushes the resulting image to `valtoni/nginx-quic`, tagging it as `$NginxVersion-$QuicTlsRef`.
 - Pass `-MetadataPath build-meta.json` to store the resolved versions so other tooling (like the nightly job) can read them.
 
 ```powershell

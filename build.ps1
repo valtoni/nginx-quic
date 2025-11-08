@@ -124,6 +124,6 @@ docker buildx build --platform linux/amd64 `
     --build-arg "ALPINE_VERSION=$AlpineVersion" `
     --build-arg "NGINX_VERSION=$NginxVersion" `
     --build-arg "QUICTLS_REF=$QuicTlsRef" `
-    -t valtoni/nginx-quic:${NginxVersion} `
+    -t "valtoni/nginx-quic:${NginxVersion}-${QuicTlsRef}" `
     --push `
     .
