@@ -2,7 +2,8 @@ param(
     [string]$AlpineVersion,
     [string]$NginxVersion,
     [string]$QuicTlsRef,
-    [string]$MetadataPath
+    [string]$MetadataPath,
+    [switch]$DryRun
 )
 
 $ErrorActionPreference = 'Stop'
@@ -118,6 +119,11 @@ if ($MetadataPath) {
         QuicTlsRef    = $QuicTlsRef
     }
     $metadata | ConvertTo-Json | Set-Content -Path $MetadataPath -Encoding UTF8
+}
+
+if ($DryRun) {
+    Write-Host "Dry run requested – skipping docker build/push."
+    exit 0
 }
 
 docker buildx build --platform linux/amd64 `

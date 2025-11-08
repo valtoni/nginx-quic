@@ -5,6 +5,7 @@ This repository builds an nginx image with the QUIC/TLS patches on top of Alpine
 ## Build script
 - `build.ps1` downloads the latest Alpine, NGINX and quictls references (unless provided) and pushes the resulting image to `valtoni/nginx-quic`, tagging it as `$NginxVersion-$QuicTlsRef`.
 - Pass `-MetadataPath build-meta.json` to store the resolved versions so other tooling (like the nightly job) can read them.
+- Add `-DryRun` when you only want to refresh `build-meta.json` without building/pushing (the nightly workflow uses this to decide whether to skip a run).
 
 ```powershell
 # Build with automatically detected versions
@@ -12,14 +13,18 @@ This repository builds an nginx image with the QUIC/TLS patches on top of Alpine
 
 # Build with explicit versions and capture metadata
 ./build.ps1 -AlpineVersion 3.20 -NginxVersion 1.27.1 -QuicTlsRef openssl-3.2.2+quic1 -MetadataPath build-meta.json
+
+# Refresh metadata only (no build/push)
+./build.ps1 -MetadataPath build-meta.json -DryRun
 ```
 
 ## Nightly build workflow
 `.github/workflows/nightly-build.yaml` runs every day at 03:00 UTC (or manually) and will:
-1. Execute `build.ps1`.
-2. Read `build-meta.json`.
-3. Insert a line in the table below with the versions and timestamps.
-4. Commit the updated README.
+1. Resolve the next tag via `./build.ps1 -DryRun` and bail out early if `valtoni/nginx-quic:<nginx-version>-<quictls-ref>` already exists on Docker Hub.
+2. When the tag is new, execute the build/push with `build.ps1`.
+3. Read `build-meta.json`.
+4. Insert a line in the table below with the versions and timestamps.
+5. Commit the updated README.
 
 ## Nightly builds
 <!-- BEGIN_NIGHTLY_BUILDS -->
