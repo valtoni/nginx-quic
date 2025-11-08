@@ -28,7 +28,7 @@ This repository builds an nginx image with the QUIC/TLS patches on top of Alpine
 
 ## Nightly builds
 <!-- BEGIN_NIGHTLY_BUILDS -->
-| Date | Alpine | NGINX | Start (UTC) | End (UTC) | Logs |
-| --- | --- | --- | --- | --- | --- |
-| 2025-11-08 | 3.22 | 1.29.3 | 2025-11-08T21:42:45Z | 2025-11-08T21:49:44Z | [Logs](https://github.com/valtoni/nginx-quic/actions/runs/19199011004) |
+| Date | Alpine | NGINX | QUIC-TLS | Image | Start (UTC) | End (UTC) | Logs |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2025-11-08 | 3.22 | 1.29.3 | - | - | 2025-11-08T21:42:45Z | 2025-11-08T21:49:44Z | [Logs](https://github.com/valtoni/nginx-quic/actions/runs/19199011004) |
 <!-- END_NIGHTLY_BUILDS -->

@@ -95,14 +95,17 @@ jobs:
           END_TS: ${{ steps.finish.outputs.ts }}
           ALPINE_VERSION: ${{ steps.versions.outputs.alpine }}
           NGINX_VERSION: ${{ steps.versions.outputs.nginx }}
+          QUIC_VERSION: ${{ steps.versions.outputs.quic }}
+          DOCKER_TAG: ${{ steps.versions.outputs.docker_tag }}
           LOG_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           $path = $env:README_PATH
           $startMarker = '<!-- BEGIN_NIGHTLY_BUILDS -->'
           $endMarker = '<!-- END_NIGHTLY_BUILDS -->'
-          $header1 = '| Date | Alpine | NGINX | Start (UTC) | End (UTC) | Logs |'
-          $header2 = '| --- | --- | --- | --- | --- | --- |'
-          $row = "| $($env:START_TS.Substring(0,10)) | $env:ALPINE_VERSION | $env:NGINX_VERSION | $env:START_TS | $env:END_TS | [Logs]($env:LOG_URL) |"
+          $header1 = '| Date | Alpine | NGINX | QUIC-TLS | Image | Start (UTC) | End (UTC) | Logs |'
+          $header2 = '| --- | --- | --- | --- | --- | --- | --- | --- |'
+          $imageLink = "[valtoni/nginx-quic:$($env:DOCKER_TAG)](https://hub.docker.com/layers/valtoni/nginx-quic/$($env:DOCKER_TAG)/)"
+          $row = "| $($env:START_TS.Substring(0,10)) | $env:ALPINE_VERSION | $env:NGINX_VERSION | $env:QUIC_VERSION | $imageLink | $env:START_TS | $env:END_TS | [Logs]($env:LOG_URL) |"
 
           if (-not (Test-Path $path)) {
               Set-Content -Path $path -Value '# nginx-quic'
