@@ -125,4 +125,5 @@ docker buildx build --platform linux/amd64 `
     --build-arg "NGINX_VERSION=$NginxVersion" `
     --build-arg "QUICTLS_REF=$QuicTlsRef" `
     -t valtoni/nginx-quic:${NginxVersion} `
-    --push
+    --push `
+    .

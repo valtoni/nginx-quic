@@ -32,7 +32,6 @@ RUN apk add --no-cache pcre2 zlib && \
 
 COPY --from=build /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=build /usr/share/nginx /usr/share/nginx
-COPY --from=build /usr/lib/nginx /usr/lib/nginx
 COPY --from=build /etc/nginx /etc/nginx
 
 RUN adduser -D -g 'nginx' nginx
