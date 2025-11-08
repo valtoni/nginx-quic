@@ -1,0 +1,123 @@
+name: Build nginx-quic nightly
+
+on:
+  schedule:
+    - cron: '0 3 * * *'   # executa diariamente as 03:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      IMAGE: nginx-quic
+      VERSION: nightly-${{ github.run_number }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Record build start
+        id: start
+        run: echo "ts=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
+
+      - name: Run build script
+        shell: pwsh
+        env:
+          METADATA_PATH: build-meta.json
+        run: ./build.ps1 -MetadataPath $env:METADATA_PATH
+
+      - name: Record build end
+        id: finish
+        run: echo "ts=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
+
+      - name: Read build metadata
+        id: versions
+        shell: pwsh
+        run: |
+          $meta = Get-Content build-meta.json | ConvertFrom-Json
+          "alpine=$($meta.AlpineVersion)" >> $env:GITHUB_OUTPUT
+          "nginx=$($meta.NginxVersion)" >> $env:GITHUB_OUTPUT
+
+      - name: Update README with build record
+        id: update-readme
+        shell: pwsh
+        env:
+          README_PATH: README.md
+          START_TS: ${{ steps.start.outputs.ts }}
+          END_TS: ${{ steps.finish.outputs.ts }}
+          ALPINE_VERSION: ${{ steps.versions.outputs.alpine }}
+          NGINX_VERSION: ${{ steps.versions.outputs.nginx }}
+          LOG_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          $path = $env:README_PATH
+          $startMarker = '<!-- BEGIN_NIGHTLY_BUILDS -->'
+          $endMarker = '<!-- END_NIGHTLY_BUILDS -->'
+          $header1 = '| Date | Alpine | NGINX | Start (UTC) | End (UTC) | Logs |'
+          $header2 = '| --- | --- | --- | --- | --- | --- |'
+          $row = "| $($env:START_TS.Substring(0,10)) | $env:ALPINE_VERSION | $env:NGINX_VERSION | $env:START_TS | $env:END_TS | [Logs]($env:LOG_URL) |"
+
+          if (-not (Test-Path $path)) {
+              Set-Content -Path $path -Value '# nginx-quic'
+          }
+
+          $lines = [System.Collections.Generic.List[string]]::new()
+          $existing = Get-Content -Path $path -ErrorAction SilentlyContinue
+          if ($existing) {
+              $lines.AddRange([string[]]$existing)
+          }
+
+          if ($lines.Count -eq 0) {
+              $lines.Add('# nginx-quic')
+          }
+
+          if (-not $lines.Contains($startMarker)) {
+              if ($lines[$lines.Count - 1].Trim().Length -ne 0) {
+                  $lines.Add('')
+              }
+              $lines.Add('## Nightly Builds')
+              $lines.Add($startMarker)
+              $lines.Add($header1)
+              $lines.Add($header2)
+              $lines.Add($endMarker)
+          }
+
+          $startIndex = $lines.IndexOf($startMarker)
+          $endIndex = $lines.IndexOf($endMarker)
+
+          if ($startIndex -lt 0 -or $endIndex -lt 0 -or $endIndex -le $startIndex) {
+              throw 'Unable to locate markers in README.'
+          }
+
+          $insertIndex = $startIndex + 3
+          $lines.Insert($insertIndex, $row)
+
+          Set-Content -Path $path -Value $lines -Encoding UTF8
+
+      - name: Commit build log
+        shell: bash
+        run: |
+          if git diff --quiet README.md; then
+            echo "No README changes to commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "docs: record nightly build $GITHUB_RUN_ID"
+          git push
+
+
