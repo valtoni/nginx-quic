@@ -83,17 +83,22 @@ function Get-LatestQuicTlsRef {
     param([hashtable]$Headers)
     return Get-LatestGithubTagVersion `
         -Repo 'quictls/openssl' `
-        -Pattern '^(?<tag>openssl-(?<version>[0-9]+\.[0-9]+\.[0-9]+)\+quic(?<quic>[0-9]+))$' `
+        -Pattern '^(?<tag>openssl-(?<version>[0-9]+\.[0-9]+\.[0-9]+))(?:\+quic(?<quic>[0-9]+))?$' `
         -Headers $Headers `
         -OutputGroup 'tag' `
         -SortKeyScript {
             param($match)
             $v = [version]$match.Groups['version'].Value
+            $quic = if ($match.Groups['quic'].Success) {
+                [int]$match.Groups['quic'].Value
+            } else {
+                -1
+            }
             [System.Tuple]::Create(
                 $v.Major,
                 $v.Minor,
                 $v.Build,
-                [int]$match.Groups['quic'].Value
+                $quic
             )
         }
 }
