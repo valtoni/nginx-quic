@@ -16,7 +16,7 @@ RUN apk add --no-cache build-base pcre2-dev zlib-dev git cmake go curl perl linu
       --prefix=/usr/share/nginx \
       --sbin-path=/usr/sbin/nginx \
       --conf-path=/etc/nginx/nginx.conf \
-      --pid-path=/var/run/nginx.pid \
+      --pid-path=/var/run/nginx/nginx.pid \
       --http-log-path=/var/log/nginx/access.log \
       --error-log-path=/var/log/nginx/error.log \
       --http-client-body-temp-path=/var/cache/nginx/client_temp \
@@ -50,7 +50,8 @@ RUN adduser -D -g 'nginx' nginx && \
       /var/cache/nginx/fastcgi_temp \
       /var/cache/nginx/uwsgi_temp \
       /var/cache/nginx/scgi_temp \
-      /var/log/nginx
+      /var/log/nginx \
+      /var/run/nginx
 USER nginx
 EXPOSE 80 443/udp 443
 CMD ["nginx", "-g", "daemon off;"]
