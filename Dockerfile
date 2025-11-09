@@ -17,6 +17,13 @@ RUN apk add --no-cache build-base pcre2-dev zlib-dev git cmake go curl perl linu
       --sbin-path=/usr/sbin/nginx \
       --conf-path=/etc/nginx/nginx.conf \
       --pid-path=/var/run/nginx.pid \
+      --http-log-path=/var/log/nginx/access.log \
+      --error-log-path=/var/log/nginx/error.log \
+      --http-client-body-temp-path=/var/cache/nginx/client_temp \
+      --http-proxy-temp-path=/var/cache/nginx/proxy_temp \
+      --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
+      --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp \
+      --http-scgi-temp-path=/var/cache/nginx/scgi_temp \
       --with-http_ssl_module \
       --with-http_v2_module \
       --with-http_v3_module \
@@ -27,14 +34,21 @@ RUN apk add --no-cache build-base pcre2-dev zlib-dev git cmake go curl perl linu
 
 FROM alpine:${ALPINE_VERSION} AS runtime
 
-RUN apk add --no-cache pcre2 zlib && \
-    mkdir -p /var/cache/nginx /var/log/nginx
+RUN apk add --no-cache pcre2 zlib
 
 COPY --from=build /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=build /usr/share/nginx /usr/share/nginx
 COPY --from=build /etc/nginx /etc/nginx
 
-RUN adduser -D -g 'nginx' nginx
+RUN adduser -D -g 'nginx' nginx && \
+    install -d -o nginx -g nginx \
+      /var/cache/nginx \
+      /var/cache/nginx/client_temp \
+      /var/cache/nginx/proxy_temp \
+      /var/cache/nginx/fastcgi_temp \
+      /var/cache/nginx/uwsgi_temp \
+      /var/cache/nginx/scgi_temp \
+      /var/log/nginx
 USER nginx
 EXPOSE 80 443/udp 443
 CMD ["nginx", "-g", "daemon off;"]
