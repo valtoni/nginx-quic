@@ -34,11 +34,13 @@ RUN apk add --no-cache build-base pcre2-dev zlib-dev git cmake go curl perl linu
 
 FROM alpine:${ALPINE_VERSION} AS runtime
 
-RUN apk add --no-cache pcre2 zlib
+RUN apk add --no-cache pcre2 zlib libcap-utils
 
 COPY --from=build /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=build /usr/share/nginx /usr/share/nginx
 COPY --from=build /etc/nginx /etc/nginx
+
+RUN setcap 'cap_net_bind_service=+ep' /usr/sbin/nginx
 
 RUN adduser -D -g 'nginx' nginx && \
     install -d -o nginx -g nginx \
