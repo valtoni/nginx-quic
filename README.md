@@ -30,6 +30,7 @@ This repository builds an nginx image with the QUIC/TLS patches on top of Alpine
 <!-- BEGIN_NIGHTLY_BUILDS -->
 | Date | Alpine | NGINX | QUIC-TLS | Image | Start (UTC) | End (UTC) | Logs |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-09-16 | 3.24 | 1.31.6 | openssl-3.3.2 | [valtoni/nginx-quic:1.31.6-openssl-3.3.2](https://hub.docker.com/layers/valtoni/nginx-quic/1.31.6-openssl-3.3.2/) | 2026-09-16T08:19:22Z | 2026-09-16T08:28:15Z | [Logs](https://github.com/valtoni/nginx-quic/actions/runs/35073094623) |
 | 2026-09-03 | 3.24 | 1.31.5 | openssl-3.3.2 | [valtoni/nginx-quic:1.31.5-openssl-3.3.2](https://hub.docker.com/layers/valtoni/nginx-quic/1.31.5-openssl-3.3.2/) | 2026-09-03T07:49:50Z | 2026-09-03T07:58:46Z | [Logs](https://github.com/valtoni/nginx-quic/actions/runs/33730094658) |
 | 2026-08-20 | 3.24 | 1.31.4 | openssl-3.3.2 | [valtoni/nginx-quic:1.31.4-openssl-3.3.2](https://hub.docker.com/layers/valtoni/nginx-quic/1.31.4-openssl-3.3.2/) | 2026-08-20T03:45:51Z | 2026-08-20T03:52:23Z | [Logs](https://github.com/valtoni/nginx-quic/actions/runs/32329370962) |
 | 2026-07-17 | 3.24 | 1.31.3 | openssl-3.3.2 | [valtoni/nginx-quic:1.31.3-openssl-3.3.2](https://hub.docker.com/layers/valtoni/nginx-quic/1.31.3-openssl-3.3.2/) | 2026-07-17T05:42:28Z | 2026-07-17T05:51:23Z | [Logs](https://github.com/valtoni/nginx-quic/actions/runs/29558009006) |
